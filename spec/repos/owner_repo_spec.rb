@@ -11,8 +11,8 @@ describe PetShop::OwnerRepo do
 
   before(:each) do
     PetShop.clear_db(db)
-    @owner_id1 = PetShop::OwnerRepo.save(db, { 'username' => "Giovanni", 'password' => 'Swordfish' })['id']
-    @owner_id2 = PetShop::OwnerRepo.save(db, { 'username' => "Leonardo", 'password' => 'Swordfish' })['id']
+    @owner_id1 = PetShop::OwnerRepo.save(db, { 'username' => "Giovanni", 'password' => 'Swordfish4' })['id']
+    @owner_id2 = PetShop::OwnerRepo.save(db, { 'username' => "Leonardo", 'password' => 'Swordfish4' })['id']
   end
 
   it "gets all owners" do
@@ -39,13 +39,13 @@ describe PetShop::OwnerRepo do
     owner = repo.all(db).first
     expect(owner['id']).to_not be_nil
     expect(owner['username']).to eq "Giovanni"
-    expect(owner['password']).to eq "Swordfish"
+    expect(owner['password']).to eq "Swordfish4"
 
   end
 
   it "requires a username" do
     expect { repo.save(db, {}) }.to raise_error {|e|
-      expect(e.message).to match /username/
+      expect(e.message).to match /Validation failed/
     }
   end
 
@@ -54,7 +54,7 @@ describe PetShop::OwnerRepo do
       repo.save(db, { 'id' => 999, 'username' => "Mr FunGuy" })
     }
     .to raise_error {|e|
-      expect(e.message).to match /owner id/
+      expect(e.message).to match /Couldn't find PetShop::Owner with 'id'=999/
     }
   end
 

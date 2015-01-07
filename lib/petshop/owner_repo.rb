@@ -4,21 +4,17 @@ module PetShop
   class OwnerRepo
 
     def self.all(db)
-      # Other code should not have to deal with the PG:Result.
-      # Therefore, convert the results into a plain array.
-      result = db.exec("SELECT * FROM owners").to_a
+      Owner.all.to_a()
     end
 
     def self.find(db, owner_id)
-      owner = db.exec("SELECT * FROM owners WHERE id=$1", [owner_id]).first
+      Owner.find(owner_id)
     end
 
     # find user by username. Intended to be used when
     # someone tries to sign in.
     def self.find_by_name db, username
-      sql = %q[SELECT * FROM owners WHERE username = $1]
-      result = db.exec(sql, [username])
-      result.first
+      Owner.find_by(username: username)
     end
 
     def self.save(db, owner_data)
@@ -26,29 +22,28 @@ module PetShop
 
         # Ensure owner exists
         owner = find(db, owner_data['id'])
-        raise "A valid owner id is required." if owner.nil?
 
         if owner_data['username'] # Update Owner Name
-          result = db.exec("UPDATE owners SET username = $2 WHERE id = $1", [owner_data['id'], owner_data['username']])
+          owner.username = owner_data['username']
         end
 
         if owner_data['password'] # Update Owner Password
-          result = db.exec("UPDATE owners SET password = $2 WHERE id = $1", [owner_data['id'], owner_data['password']])
+          owner.password = owner_data['password']
         end
+        owner.save
         self.find(db, owner_data['id'])
       else
-        raise "username is required." if owner_data['username'].nil? || owner_data['username'] == ''
-        raise "password is required." if owner_data['password'].nil? || owner_data['password'] == ''
-        result = db.exec("INSERT INTO owners (username, password) VALUES ($1, $2) RETURNING *", [owner_data['username'], owner_data['password']])
-        self.find(db, result.entries.first['id'])
+        result = Owner.create!(username: owner_data['username'], password: owner_data['password'])
+        self.find(db, result['id'])
       end
     end
 
     def self.destroy(db, owner_id)
       # Delete SQL statement
-      db.exec("UPDATE cats SET owner_id = null, adopted = false WHERE owner_id = $1", [owner_id])
-      db.exec("UPDATE dogs SET owner_id = null, adopted = false WHERE owner_id = $1", [owner_id])
-      db.exec("DELETE FROM owners WHERE id = $1", [owner_id])
+      Cat.where(:owner_id => owner_id).update_all(:owner_id => nil, :adopted => 'false')
+      Dog.where(:owner_id => owner_id).update_all(:owner_id => nil, :adopted => 'false')
+
+      Owner.delete(owner_id)
     end
 
   end

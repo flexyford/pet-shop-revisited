@@ -52,7 +52,7 @@ describe PetShop::ShopRepo do
       repo.save(db, { 'id' => 999, 'name' => "Mr Puppy Love" })
     }
     .to raise_error {|e|
-      expect(e.message).to match /shop id/
+      expect(e.message).to match /Couldn't find PetShop::Shop with 'id'=999/
     }
   end
 

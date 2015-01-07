@@ -2,16 +2,17 @@ require 'pg'
 
 module PetShop
   def self.create_db_connection(dbname)
-    PG.connect(host: 'localhost', dbname: dbname)
+    ActiveRecord::Base.establish_connection(
+      :adapter => 'postgresql',
+      :database => dbname
+    )
   end
 
   def self.clear_db(db)
-    db.exec <<-SQL
-      DELETE FROM cats;
-      DELETE FROM dogs;
-      DELETE FROM shops;
-      DELETE FROM owners;
-    SQL
+    Cat.delete_all
+    Dog.delete_all
+    Shop.delete_all
+    Owner.delete_all
   end
 
   def self.create_tables(db)
@@ -92,7 +93,14 @@ module PetShop
   end
 end
 
+require 'active_record'
+
 require_relative 'petshop/shop_repo'
 require_relative 'petshop/owner_repo'
 require_relative 'petshop/dog_repo'
 require_relative 'petshop/cat_repo'
+
+require_relative 'models/shop'
+require_relative 'models/owner'
+require_relative 'models/dog'
+require_relative 'models/cat'

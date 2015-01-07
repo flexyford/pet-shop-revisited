@@ -4,5 +4,5 @@ require_relative '../lib/petshop.rb' # the path to your application file
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'postgresql',
-  :database => 'pet-shop-server_test'
+  :database => 'petshop_dev'
 )

@@ -5,7 +5,6 @@ require 'json'
 require 'pry-byebug'
 # require 'rack-flash'
 
-require_relative 'lib/petshop.rb'
 require_relative 'config/environments.rb'
 
 class PetShop::Server < Sinatra::Application
@@ -18,7 +17,7 @@ class PetShop::Server < Sinatra::Application
   end
 
   before do
-    @db = PetShop.create_db_connection 'petshop_dev'
+    @db = ""
     if session[:user_id]
       owner_id = session['user_id']
       @current_user = PetShop::OwnerRepo.find @db, owner_id

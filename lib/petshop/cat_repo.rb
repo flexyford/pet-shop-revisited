@@ -4,52 +4,55 @@ module PetShop
   class CatRepo
 
     def self.all(db)
-      result = db.exec("SELECT * FROM cats").to_a
+      Cat.all.to_a()
     end
 
-    def self.find(db, cat_id)
-      cat = db.exec("SELECT * FROM cats WHERE id=$1", [cat_id]).first
+    def self.find(db, dog_id)
+      Cat.find(dog_id)
     end
 
     def self.find_all_by_shop(db, shopid)
-      cats = db.exec("SELECT * FROM cats WHERE shopid=$1", [shopid]).to_a
+      Cat.where(:shopid => shopid)
     end
 
     def self.find_all_by_owner(db, owner_id)
-      cats = db.exec("SELECT * FROM cats WHERE owner_id=$1", [owner_id]).to_a
+      Cat.where(:owner_id => owner_id)
     end
 
-    def self.save(db, cat_data)
-      if cat_data['id'] # Update an Existing Cat
+    def self.save(db, dog_data)
+      if dog_data['id'] # Update
 
-        # Ensure cat exists
-        cat = find(db, cat_data['id'])
-        raise "A valid cat_id is required." if cat.nil?
-
-        owner = find(db, cat_data['owner_id'])
-        raise "A valid owner_id is required." if owner.nil?
+        # Ensure dog exists
+        dog = find(db, dog_data['id'])
+        raise "A valid dog_id is required." if dog.nil?
+        raise "A valid owner_id is required." if dog.nil?
 
         #Assign owner
-        if cat_data['adopted'] && cat_data['name']
-          result = db.exec("UPDATE cats SET owner_id = $2, adopted = $3, name = $4 WHERE id = $1", [cat_data['id'], cat_data['owner_id'], cat_data['adopted'], cat_data['name']])
-        elsif cat_data['name']
-          result = db.exec("UPDATE cats SET owner_id = $2, name = $3 WHERE id = $1", [cat_data['id'], cat_data['owner_id'], cat_data['name']])
-        elsif cat_data['adopted']
-          result = db.exec("UPDATE cats SET owner_id = $2, adopted = $3 WHERE id = $1", [cat_data['id'], cat_data['owner_id'], cat_data['adopted']])
+        if dog_data['adopted'] && dog_data['name']
+          dog.name = dog_data['name']
+          dog.adopted = dog_data['adopted']
+          dog.owner_id = dog_data['owner_id']
+        elsif dog_data['name']
+          dog.name = dog_data['name']
+          dog.owner_id = dog_data['owner_id']
+        elsif dog_data['adopted']
+          dog.adopted = dog_data['adopted']
+          dog.owner_id = dog_data['owner_id']
         end
-        self.find(db, cat_data['id'])
-      else # Create a New Cat
-        raise "name is required." if cat_data['name'].nil? || cat_data['name'] == ''
-        raise "shopid is required." if cat_data['shopid'].nil? || cat_data['shopid'] == ''
-        raise "imageurl is required." if cat_data['imageurl'].nil? || cat_data['imageurl'] == ''
-        result = db.exec("INSERT INTO cats (name, shopid, imageurl, adopted) values ($1, $2, $3, 'false') RETURNING id", [cat_data['name'], cat_data['shopid'], cat_data['imageurl']])
-        self.find(db, result.entries.first['id'])
+        dog.save
+        self.find(db, dog_data['id'])
+      else
+        raise "name is required." if dog_data['name'].nil? || dog_data['name'] == ''
+        raise "shopid is required." if dog_data['shopid'].nil? || dog_data['shopid'] == ''
+        raise "imageurl is required." if dog_data['imageurl'].nil? || dog_data['imageurl'] == ''
+        result = Cat.create(name: dog_data['name'], shopid: dog_data['shopid'], imageurl: dog_data['imageurl'])
+        self.find(db, result['id'])
       end
     end
 
-    def self.destroy(db, cat_id)
+    def self.destroy(db, dog_id)
       # Delete SQL statement
-      db.exec("DELETE FROM cats WHERE id = $1", [cat_id])
+      Cat.delete(dog_id)
     end
 
   end

@@ -40,7 +40,6 @@
 
   var petsView = function (ctrl, type, pets) {
     if (!pets) return null
-    debugger
     var petDivs = pets.map(function(pet) {
       var adoptLink = m('a', {
         onclick: ctrl.adopt.coldCurry(type, pet.id),
